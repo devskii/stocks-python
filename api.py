@@ -9,6 +9,10 @@ def get_stock_balance_sheet(symbol):
     return get_function(symbol, "BALANCE_SHEET")
 
 
+def get_stock_earnings(symbol):
+    return get_function(symbol, "EARNINGS")
+
+
 def get_function(symbol, function):
     api_key = "***REMOVED***"
     base_url = "https://www.alphavantage.co/query?"

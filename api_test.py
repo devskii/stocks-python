@@ -17,6 +17,11 @@ class TestApi(unittest.TestCase):
         data = api.get_stock_balance_sheet(symbol)
         self.assertEqual(data.get("symbol"), symbol)
 
+    def test_get_earnings(self):
+        symbol = "AAPL"
+        data = api.get_stock_earnings(symbol)
+        self.assertEqual(data.get("symbol"), symbol)
+
 
 if __name__ == "__main__":
     unittest.main()
