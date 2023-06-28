@@ -72,5 +72,39 @@ class TestGetStockData(unittest.TestCase):
         }
         self.assertFalse(recommender.has_consistent_earnings(earnings))
 
+    def test_has_earnings_growth(self):
+        earnings = {
+            "annualEarnings": [
+                {"reportedEPS": 1.33},
+                {"reportedEPS": 1.33},
+                {"reportedEPS": 1.33},
+                {"reportedEPS": 0},
+                {"reportedEPS": 0},
+                {"reportedEPS": 0},
+                {"reportedEPS": 0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0}
+            ]
+        }
+        self.assertTrue(recommender.has_earnings_growth(earnings))
+
+    def test_has_insufficient_earnings_growth(self):
+        earnings = {
+            "annualEarnings": [
+                {"reportedEPS": 1.32},
+                {"reportedEPS": 1.32},
+                {"reportedEPS": 1.32},
+                {"reportedEPS": 0},
+                {"reportedEPS": 0},
+                {"reportedEPS": 0},
+                {"reportedEPS": 0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0}
+            ]
+        }
+        self.assertFalse(recommender.has_earnings_growth(earnings))
+
 if __name__ == "__main__":
     unittest.main()
