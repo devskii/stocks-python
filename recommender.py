@@ -1,5 +1,6 @@
 import api
-
+import plotly.graph_objects as go
+import pandas as pd
 
 def is_large_cap(overview):
     mcap = int(overview["MarketCapitalization"])
@@ -29,13 +30,34 @@ def has_earnings_growth(earnings):
     return growth >= 0.33
 
 
-def analyze_example():
-    symbol = "AAPL"
+def plot(dividends):
+    # Create DataFrame with dates and corresponding dividends
+    df = pd.DataFrame(list(dividends.items()), columns=['Date', 'Dividend'])
+    df['Date'] = pd.to_datetime(df['Date'])
+    
+    # Resample to fill missing dates
+    df.set_index('Date', inplace=True)
+    df = df.resample('M').asfreq()
+    df.reset_index(inplace=True)
 
+    # Create the plot
+    fig = go.Figure(data=go.Scatter(x=df['Date'], y=df['Dividend'], mode='markers'))
+    
+    # Configure the plot
+    fig.update_layout(title='Dividend History', xaxis_title='Date', yaxis_title='Dividend Amount')
+    
+    # Display the plot
+    fig.show()
+
+def analyze(symbol):
     overview = api.get_stock_overview(symbol)
     balance_sheet = api.get_stock_balance_sheet(symbol)
     earnings = api.get_stock_earnings(symbol)
-
+    time_series_monthly_adjusted = api.get_stock_time_series_monthly_adjusted(symbol)
+    
+    time_series_items = time_series_monthly_adjusted['Monthly Adjusted Time Series'].items()
+    dividends = {date: float(info['7. dividend amount']) for date, info in time_series_items if float(info['7. dividend amount']) > 0 }
+    
     size = is_large_cap(overview)
     current = has_healthy_current_ratio(balance_sheet)
     earnings_consistent = has_consistent_earnings(earnings)
@@ -50,10 +72,13 @@ def analyze_example():
     print(f"has_healthy_current_ratio: {current}")
     print(f"has_consistent_earnings: {earnings_consistent}")
     print(f"has_earnings_growth: {earnings_growth}")
+    print("----- Dividend History -----")
+    plot(dividends)
     print("============================")
 
 def main():
-    analyze_example()
+    symbol = "AAPL"
+    analyze(symbol)
 
 
 if __name__ == "__main__":

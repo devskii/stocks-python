@@ -13,6 +13,10 @@ def get_stock_earnings(symbol):
     return get_function(symbol, "EARNINGS")
 
 
+def get_stock_time_series_monthly_adjusted(symbol):
+    return get_function(symbol, "TIME_SERIES_MONTHLY_ADJUSTED")
+
+
 def get_function(symbol, function):
     api_key = "***REMOVED***"
     base_url = "https://www.alphavantage.co/query?"
