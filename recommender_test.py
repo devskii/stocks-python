@@ -1,5 +1,8 @@
 import recommender
+import sys
 import unittest
+from unittest.mock import patch
+from io import StringIO
 
 
 class TestGetStockData(unittest.TestCase):
@@ -149,6 +152,21 @@ class TestGetStockData(unittest.TestCase):
             'Global Quote': {'05. price': '60.01'}
         }
         self.assertFalse(recommender.has_low_pe_ratio(earnings, quote))
+
+    @patch.object(sys, 'argv', ['recommender.py'])
+    def test_no_ticker_symbol(self):
+        # Create a new StringIO object and redirect stdout to it
+        captured_output = StringIO()
+        sys.stdout = captured_output
+
+        with self.assertRaises(SystemExit):
+            recommender.main()
+
+        # Reset stdout to its normal value
+        sys.stdout = sys.__stdout__
+
+        # Check the value that was printed
+        self.assertEqual(captured_output.getvalue().strip(), "Please provide a ticker symbol as a command-line argument.")
 
 if __name__ == "__main__":
     unittest.main()

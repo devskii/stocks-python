@@ -1,6 +1,7 @@
 import api
 import plotly.graph_objects as go
 import pandas as pd
+import sys
 from pprint import pprint
 
 def is_large_cap(overview):
@@ -81,8 +82,13 @@ def analyze(symbol):
     print("============================")
 
 def main():
-    symbol = "AAPL"
-    analyze(symbol)
+    if len(sys.argv) > 1:
+        symbol = sys.argv[1]
+        analyze(symbol)
+    else:
+        print("Please provide a ticker symbol as a command-line argument.")
+        sys.exit(1)
+        
 
 
 if __name__ == "__main__":
