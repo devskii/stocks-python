@@ -106,5 +106,49 @@ class TestGetStockData(unittest.TestCase):
         }
         self.assertFalse(recommender.has_earnings_growth(earnings))
 
+    def test_has_low_pe_ratio(self):
+        earnings = {
+            "quarterlyEarnings": [
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0}
+            ]
+        }
+        quote = {
+            'Global Quote': {'05. price': '60.00'},
+        }
+        self.assertTrue(recommender.has_low_pe_ratio(earnings, quote))
+    
+    def test_has_high_pe_ratio(self):
+        earnings = {
+            "quarterlyEarnings": [
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0},
+                {"reportedEPS": 1.0}
+            ]
+        }
+        quote = {
+            'Global Quote': {'05. price': '60.01'}
+        }
+        self.assertFalse(recommender.has_low_pe_ratio(earnings, quote))
+
 if __name__ == "__main__":
     unittest.main()

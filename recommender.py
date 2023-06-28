@@ -1,6 +1,7 @@
 import api
 import plotly.graph_objects as go
 import pandas as pd
+from pprint import pprint
 
 def is_large_cap(overview):
     mcap = int(overview["MarketCapitalization"])
@@ -30,50 +31,53 @@ def has_earnings_growth(earnings):
     return growth >= 0.33
 
 
-def plot(dividends):
-    # Create DataFrame with dates and corresponding dividends
+def has_low_pe_ratio(earnings, quote):
+    quarterly_earnings = earnings['quarterlyEarnings']
+    recent_quarters_earnings = [float(quarter['reportedEPS']) for quarter in quarterly_earnings[:12]]
+    average_annual_earnings = sum(recent_quarters_earnings) / 3
+    price = float(quote['Global Quote']['05. price'])
+    ratio = price / average_annual_earnings
+    return ratio <= 15.0
+
+
+def plot_dividends(time_series_monthly_adjusted):
+    time_series_items = time_series_monthly_adjusted['Monthly Adjusted Time Series'].items()
+    dividends = {date: float(info['7. dividend amount']) for date, info in time_series_items if float(info['7. dividend amount']) > 0 }
     df = pd.DataFrame(list(dividends.items()), columns=['Date', 'Dividend'])
     df['Date'] = pd.to_datetime(df['Date'])
-    
-    # Resample to fill missing dates
     df.set_index('Date', inplace=True)
     df = df.resample('M').asfreq()
     df.reset_index(inplace=True)
-
-    # Create the plot
     fig = go.Figure(data=go.Scatter(x=df['Date'], y=df['Dividend'], mode='markers'))
-    
-    # Configure the plot
     fig.update_layout(title='Dividend History', xaxis_title='Date', yaxis_title='Dividend Amount')
-    
-    # Display the plot
     fig.show()
+
 
 def analyze(symbol):
     overview = api.get_stock_overview(symbol)
     balance_sheet = api.get_stock_balance_sheet(symbol)
     earnings = api.get_stock_earnings(symbol)
     time_series_monthly_adjusted = api.get_stock_time_series_monthly_adjusted(symbol)
+    quote = api.get_stock_quote(symbol)
     
-    time_series_items = time_series_monthly_adjusted['Monthly Adjusted Time Series'].items()
-    dividends = {date: float(info['7. dividend amount']) for date, info in time_series_items if float(info['7. dividend amount']) > 0 }
-    
-    size = is_large_cap(overview)
-    current = has_healthy_current_ratio(balance_sheet)
+    large = is_large_cap(overview)
+    healthy_current = has_healthy_current_ratio(balance_sheet)
     earnings_consistent = has_consistent_earnings(earnings)
     earnings_growth = has_earnings_growth(earnings)
+    low_pe = has_low_pe_ratio(earnings, quote)
 
-    recommendation = size and current and earnings_consistent and earnings_growth
+    recommendation = large and healthy_current and earnings_consistent and earnings_growth and low_pe
 
     print("====== RECOMMENDATION ======")
     print(f"The recommendation for {symbol} is {recommendation}")
+    print("Friendly reminder to check the dividend looks strong (increasing) and consistent (no gaps) for the past 20+ years.")
     print("--------- Criteria ---------")
-    print(f"is_large_cap: {size}")
-    print(f"has_healthy_current_ratio: {current}")
+    print(f"is_large_cap: {large}")
+    print(f"has_healthy_current_ratio: {healthy_current}")
     print(f"has_consistent_earnings: {earnings_consistent}")
     print(f"has_earnings_growth: {earnings_growth}")
-    print("----- Dividend History -----")
-    plot(dividends)
+    print(f"has_low_pe_ratio: {low_pe}")
+    plot_dividends(time_series_monthly_adjusted)
     print("============================")
 
 def main():
