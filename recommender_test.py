@@ -6,38 +6,40 @@ from io import StringIO
 
 
 class TestGetStockData(unittest.TestCase):
+    def test_extract_market_cap(self):
+        market_cap = 30000000001
+        overview = {"MarketCapitalization": market_cap}
+        self.assertEqual(recommender.extract_market_cap(overview), market_cap)
+
     def test_large_cap(self):
-        overview = {"MarketCapitalization": 30000000001}
-        self.assertTrue(recommender.is_large_cap(overview))
+        market_cap = 30000000001
+        self.assertTrue(recommender.is_large_cap(market_cap))
 
     def test_not_large_cap(self):
-        overview = {"MarketCapitalization": 29999999999}
-        self.assertFalse(recommender.is_large_cap(overview))
+        market_cap = 29999999999
+        self.assertFalse(recommender.is_large_cap(market_cap))
 
     def test_has_healthy_current_ratio(self):
         balance_sheet = {
-            "quarterlyReports": [{
-                "totalCurrentAssets": 2000,
-                "totalCurrentLiabilities": 1000
-            }]
+            "quarterlyReports": [
+                {"totalCurrentAssets": 2000, "totalCurrentLiabilities": 1000}
+            ]
         }
         self.assertTrue(recommender.has_healthy_current_ratio(balance_sheet))
 
     def test_has_unhealthy_high_current_ratio(self):
         balance_sheet = {
-            "quarterlyReports": [{
-                "totalCurrentAssets": 3001,
-                "totalCurrentLiabilities": 1000
-            }]
+            "quarterlyReports": [
+                {"totalCurrentAssets": 3001, "totalCurrentLiabilities": 1000}
+            ]
         }
         self.assertFalse(recommender.has_healthy_current_ratio(balance_sheet))
 
     def test_has_unhealthy_low_current_ratio(self):
         balance_sheet = {
-            "quarterlyReports": [{
-                "totalCurrentAssets": 1499,
-                "totalCurrentLiabilities": 1000
-            }]
+            "quarterlyReports": [
+                {"totalCurrentAssets": 1499, "totalCurrentLiabilities": 1000}
+            ]
         }
         self.assertFalse(recommender.has_healthy_current_ratio(balance_sheet))
 
@@ -53,7 +55,7 @@ class TestGetStockData(unittest.TestCase):
                 {"reportedEPS": 0.1},
                 {"reportedEPS": 0.1},
                 {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1}
+                {"reportedEPS": 0.1},
             ]
         }
         self.assertTrue(recommender.has_consistent_earnings(earnings))
@@ -70,7 +72,7 @@ class TestGetStockData(unittest.TestCase):
                 {"reportedEPS": 0.1},
                 {"reportedEPS": 0.1},
                 {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1}
+                {"reportedEPS": 0.1},
             ]
         }
         self.assertFalse(recommender.has_consistent_earnings(earnings))
@@ -87,7 +89,7 @@ class TestGetStockData(unittest.TestCase):
                 {"reportedEPS": 0},
                 {"reportedEPS": 1.0},
                 {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0}
+                {"reportedEPS": 1.0},
             ]
         }
         self.assertTrue(recommender.has_earnings_growth(earnings))
@@ -104,7 +106,7 @@ class TestGetStockData(unittest.TestCase):
                 {"reportedEPS": 0},
                 {"reportedEPS": 1.0},
                 {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0}
+                {"reportedEPS": 1.0},
             ]
         }
         self.assertFalse(recommender.has_earnings_growth(earnings))
@@ -123,14 +125,14 @@ class TestGetStockData(unittest.TestCase):
                 {"reportedEPS": 1.0},
                 {"reportedEPS": 1.0},
                 {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0}
+                {"reportedEPS": 1.0},
             ]
         }
         quote = {
-            'Global Quote': {'05. price': '60.00'},
+            "Global Quote": {"05. price": "60.00"},
         }
         self.assertTrue(recommender.has_low_pe_ratio(earnings, quote))
-    
+
     def test_has_high_pe_ratio(self):
         earnings = {
             "quarterlyEarnings": [
@@ -145,15 +147,13 @@ class TestGetStockData(unittest.TestCase):
                 {"reportedEPS": 1.0},
                 {"reportedEPS": 1.0},
                 {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0}
+                {"reportedEPS": 1.0},
             ]
         }
-        quote = {
-            'Global Quote': {'05. price': '60.01'}
-        }
+        quote = {"Global Quote": {"05. price": "60.01"}}
         self.assertFalse(recommender.has_low_pe_ratio(earnings, quote))
 
-    @patch.object(sys, 'argv', ['recommender.py'])
+    @patch.object(sys, "argv", ["recommender.py"])
     def test_no_ticker_symbol(self):
         # Create a new StringIO object and redirect stdout to it
         captured_output = StringIO()
@@ -166,7 +166,11 @@ class TestGetStockData(unittest.TestCase):
         sys.stdout = sys.__stdout__
 
         # Check the value that was printed
-        self.assertEqual(captured_output.getvalue().strip(), "Please provide a ticker symbol as a command-line argument.")
+        self.assertEqual(
+            captured_output.getvalue().strip(),
+            "Please provide a ticker symbol as a command-line argument.",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
