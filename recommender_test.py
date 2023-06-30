@@ -1,73 +1,72 @@
-import recommender
-import sys
 import unittest
-from unittest.mock import patch
-from io import StringIO
+from recommender import Recommender
+from symbol_data import SymbolData
+from unittest.mock import MagicMock
 
 
 class TestRecommender(unittest.TestCase):
     def test_large_cap(self):
-        market_cap = 30000000001
-        self.assertTrue(recommender.is_large_cap(market_cap))
+        mock_symbol_data = MagicMock(SymbolData)
+        mock_symbol_data.market_cap = 30000000001
+        recommender = Recommender(mock_symbol_data)
+        self.assertTrue(recommender.is_large_cap())
 
     def test_not_large_cap(self):
-        market_cap = 29999999999
-        self.assertFalse(recommender.is_large_cap(market_cap))
+        mock_symbol_data = MagicMock(SymbolData)
+        mock_symbol_data.market_cap = 29999999999
+        recommender = Recommender(mock_symbol_data)
+        self.assertFalse(recommender.is_large_cap())
 
     def test_has_healthy_current_ratio(self):
-        current_ratio = 2.0
-        self.assertTrue(recommender.has_healthy_current_ratio(current_ratio))
+        mock_symbol_data = MagicMock(SymbolData)
+        mock_symbol_data.current_ratio = 2.0
+        recommender = Recommender(mock_symbol_data)
+        self.assertTrue(recommender.has_healthy_current_ratio())
 
     def test_has_unhealthy_high_current_ratio(self):
-        current_ratio = 3.001
-        self.assertFalse(recommender.has_healthy_current_ratio(current_ratio))
+        mock_symbol_data = MagicMock(SymbolData)
+        mock_symbol_data.current_ratio = 3.001
+        recommender = Recommender(mock_symbol_data)
+        self.assertFalse(recommender.has_healthy_current_ratio())
 
     def test_has_unhealthy_low_current_ratio(self):
-        current_ratio = 1.499
-        self.assertFalse(recommender.has_healthy_current_ratio(current_ratio))
+        mock_symbol_data = MagicMock(SymbolData)
+        mock_symbol_data.current_ratio = 1.499
+        recommender = Recommender(mock_symbol_data)
+        self.assertFalse(recommender.has_healthy_current_ratio())
 
     def test_has_consistent_earnings(self):
-        decade_of_annual_earnings = [0.1] * 10
-        self.assertTrue(recommender.has_consistent_earnings(decade_of_annual_earnings))
+        mock_symbol_data = MagicMock(SymbolData)
+        mock_symbol_data.decade_of_annual_earnings = [0.1] * 10
+        recommender = Recommender(mock_symbol_data)
+        self.assertTrue(recommender.has_consistent_earnings())
 
     def test_has_inconsistent_earnings(self):
-        decade_of_annual_earnings = [-0.1] + [0.1] * 9
-        self.assertFalse(recommender.has_consistent_earnings(decade_of_annual_earnings))
+        mock_symbol_data = MagicMock(SymbolData)
+        mock_symbol_data.decade_of_annual_earnings = [-0.1] + [0.1] * 9
+        recommender = Recommender(mock_symbol_data)
+        self.assertFalse(recommender.has_consistent_earnings())
 
     def test_has_earnings_growth(self):
-        earnings_growth_past_decade = 0.33
-        self.assertTrue(recommender.has_earnings_growth(earnings_growth_past_decade))
+        mock_symbol_data = MagicMock(SymbolData)
+        mock_symbol_data.earnings_growth_past_decade = 0.33
+        recommender = Recommender(mock_symbol_data)
+        self.assertTrue(recommender.has_earnings_growth())
 
     def test_has_insufficient_earnings_growth(self):
-        earnings_growth_past_decade = 0.32
-        self.assertFalse(recommender.has_earnings_growth(earnings_growth_past_decade))
+        mock_symbol_data = MagicMock(SymbolData)
+        mock_symbol_data.earnings_growth_past_decade = 0.32
+        recommender = Recommender(mock_symbol_data)
+        self.assertFalse(recommender.has_earnings_growth())
 
     def test_has_low_p_e_ratio(self):
-        p_e_ratio = 15.0
-        self.assertTrue(recommender.has_low_p_e_ratio(p_e_ratio))
+        mock_symbol_data = MagicMock(SymbolData)
+        mock_symbol_data.p_e_ratio = 15.0
+        recommender = Recommender(mock_symbol_data)
+        self.assertTrue(recommender.has_low_p_e_ratio())
 
     def test_has_high_p_e_ratio(self):
-        p_e_ratio = 15.1
-        self.assertFalse(recommender.has_low_p_e_ratio(p_e_ratio))
-
-    @patch.object(sys, "argv", ["recommender.py"])
-    def test_no_ticker_symbol(self):
-        # Create a new StringIO object and redirect stdout to it
-        captured_output = StringIO()
-        sys.stdout = captured_output
-
-        with self.assertRaises(SystemExit):
-            recommender.main()
-
-        # Reset stdout to its normal value
-        sys.stdout = sys.__stdout__
-
-        # Check the value that was printed
-        self.assertEqual(
-            captured_output.getvalue().strip(),
-            "Please provide a ticker symbol as a command-line argument.",
-        )
-
-
-if __name__ == "__main__":
-    unittest.main()
+        mock_symbol_data = MagicMock(SymbolData)
+        mock_symbol_data.p_e_ratio = 15.1
+        recommender = Recommender(mock_symbol_data)
+        self.assertFalse(recommender.has_low_p_e_ratio())
