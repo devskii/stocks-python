@@ -22,9 +22,15 @@ def plot_dividends(time_series_monthly_adjusted):
     df.reset_index(inplace=True)
     fig = go.Figure(data=go.Scatter(x=df["Date"], y=df["Dividend"], mode="markers"))
     fig.update_layout(
-        title="Dividend History", xaxis_title="Date", yaxis_title="Dividend Amount"
+        title="Dividend History<br><sub>Friendly reminder to check the dividend looks strong (increasing) and consistent (no gaps) for the past 20+ years.</sub>",
+        xaxis_title="Date",
+        yaxis_title="Dividend Amount",
     )
     fig.show()
+
+
+def bold(message):
+    return f"\033[1m{message}\033[0m"
 
 
 def analyze(symbol):
@@ -39,19 +45,16 @@ def analyze(symbol):
 
     recommender = Recommender(symbol_data)
 
-    print("====== RECOMMENDATION ======")
+    print(bold("====== RECOMMENDATION ======"))
     print(f"The recommendation for {symbol} is {recommender.recommendation()}")
-    print(
-        "Friendly reminder to check the dividend looks strong (increasing) and consistent (no gaps) for the past 20+ years."
-    )
-    print("--------- Criteria ---------")
+    print(bold("--------- Criteria ---------"))
     print(f"is_large_cap: {recommender.is_large_cap()}")
     print(f"has_healthy_current_ratio: {recommender.has_healthy_current_ratio()}")
     print(f"has_consistent_earnings: {recommender.has_consistent_earnings()}")
     print(f"has_earnings_growth: {recommender.has_earnings_growth()}")
     print(f"has_low_pe_ratio: {recommender.has_low_p_e_ratio()}")
     plot_dividends(symbol_data.time_series_monthly_adjusted)
-    print("--------- Details ----------")
+    print(bold("--------- Details ----------"))
     print(f"Market Cap: {format(symbol_data.market_cap, ',')}")
     print(f"Current Ratio: {round(symbol_data.current_ratio, 2)}")
     print(f"10 years of Annual EPS: {symbol_data.decade_of_annual_earnings}")
@@ -61,7 +64,7 @@ def analyze(symbol):
     print(
         f"P/E Ratio based on most recent 12 quarters: {round(symbol_data.p_e_ratio, 2)}"
     )
-    print("============================")
+    print(bold("============================"))
 
 
 def main():
