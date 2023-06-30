@@ -78,8 +78,14 @@ def analyze(symbol):
     time_series_monthly_adjusted = api.get_stock_time_series_monthly_adjusted(symbol)
     quote = api.get_stock_quote(symbol)
 
-    market_cap = extract_market_cap(overview)
-    current_ratio = extract_current_ratio(balance_sheet)
+    try:
+        market_cap = extract_market_cap(overview)
+        current_ratio = extract_current_ratio(balance_sheet)
+    except KeyError:
+        print(
+            "We are exceeding the API rate limit. Please wait 60 seconds for it to reset."
+        )
+        sys.exit(1)
 
     large = is_large_cap(market_cap)
     healthy_current = has_healthy_current_ratio(current_ratio)
