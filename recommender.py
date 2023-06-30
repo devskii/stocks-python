@@ -1,3 +1,4 @@
+import time
 import api
 import plotly.graph_objects as go
 import pandas as pd
@@ -12,9 +13,8 @@ def has_healthy_current_ratio(current_ratio):
     return current_ratio >= 1.5 and current_ratio <= 3
 
 
-def has_consistent_earnings(earnings):
-    annual_earnings = earnings["annualEarnings"]
-    return all(float(year["reportedEPS"]) >= 0 for year in annual_earnings)
+def has_consistent_earnings(decade_of_annual_earnings):
+    return all(eps >= 0 for eps in decade_of_annual_earnings)
 
 
 def has_earnings_growth(earnings):
@@ -71,6 +71,10 @@ def extract_current_ratio(balance_sheet):
     return total_current_assets / total_current_liabilities
 
 
+def extract_decade_of_annual_earnings(earnings):
+    return [float(year["reportedEPS"]) for year in earnings["annualEarnings"][:10]]
+
+
 def analyze(symbol):
     overview = api.get_stock_overview(symbol)
     balance_sheet = api.get_stock_balance_sheet(symbol)
@@ -81,15 +85,17 @@ def analyze(symbol):
     try:
         market_cap = extract_market_cap(overview)
         current_ratio = extract_current_ratio(balance_sheet)
+        decade_of_annual_earnings = extract_decade_of_annual_earnings(earnings)
     except KeyError:
         print(
-            "We are exceeding the API rate limit. Please wait 60 seconds for it to reset."
+            "We are exceeding the API rate limit. Please wait 60 seconds for it to reset. Sleeping..."
         )
+        time.sleep(60)
         sys.exit(1)
 
     large = is_large_cap(market_cap)
     healthy_current = has_healthy_current_ratio(current_ratio)
-    earnings_consistent = has_consistent_earnings(earnings)
+    earnings_consistent = has_consistent_earnings(decade_of_annual_earnings)
     earnings_growth = has_earnings_growth(earnings)
     low_pe = has_low_pe_ratio(earnings, quote)
 
@@ -112,7 +118,7 @@ def analyze(symbol):
     print("--------- Details ----------")
     print(f"Market Cap: {format(market_cap, ',')}")
     print(f"Current Ratio: {current_ratio}")
-    # TODO print(f"10 years of Annual EPS: {}")
+    print(f"10 years of Annual EPS: {decade_of_annual_earnings}")
     # TODO print(f"Earnings Growth over last decade: {}")
     # TODO print(f"P/E Ratio based on MR3Y: {}")
     print("============================")

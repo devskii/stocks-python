@@ -39,7 +39,7 @@ class TestGetStockData(unittest.TestCase):
         current_ratio = 1.499
         self.assertFalse(recommender.has_healthy_current_ratio(current_ratio))
 
-    def test_has_consistent_earnings(self):
+    def test_extract_decade_of_annual_earnings(self):
         earnings = {
             "annualEarnings": [
                 {"reportedEPS": 0.1},
@@ -54,24 +54,17 @@ class TestGetStockData(unittest.TestCase):
                 {"reportedEPS": 0.1},
             ]
         }
-        self.assertTrue(recommender.has_consistent_earnings(earnings))
+        self.assertEqual(
+            [0.1] * 10, recommender.extract_decade_of_annual_earnings(earnings)
+        )
+
+    def test_has_consistent_earnings(self):
+        decade_of_annual_earnings = [0.1] * 10
+        self.assertTrue(recommender.has_consistent_earnings(decade_of_annual_earnings))
 
     def test_has_inconsistent_earnings(self):
-        earnings = {
-            "annualEarnings": [
-                {"reportedEPS": -0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-            ]
-        }
-        self.assertFalse(recommender.has_consistent_earnings(earnings))
+        decade_of_annual_earnings = [-0.1] + [0.1] * 9
+        self.assertFalse(recommender.has_consistent_earnings(decade_of_annual_earnings))
 
     def test_has_earnings_growth(self):
         earnings = {
