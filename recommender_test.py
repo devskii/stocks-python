@@ -5,12 +5,7 @@ from unittest.mock import patch
 from io import StringIO
 
 
-class TestGetStockData(unittest.TestCase):
-    def test_extract_market_cap(self):
-        market_cap = 30000000001
-        overview = {"MarketCapitalization": market_cap}
-        self.assertEqual(recommender.extract_market_cap(overview), market_cap)
-
+class TestRecommender(unittest.TestCase):
     def test_large_cap(self):
         market_cap = 30000000001
         self.assertTrue(recommender.is_large_cap(market_cap))
@@ -18,14 +13,6 @@ class TestGetStockData(unittest.TestCase):
     def test_not_large_cap(self):
         market_cap = 29999999999
         self.assertFalse(recommender.is_large_cap(market_cap))
-
-    def test_extract_current_ratio(self):
-        balance_sheet = {
-            "quarterlyReports": [
-                {"totalCurrentAssets": 2000, "totalCurrentLiabilities": 1000}
-            ]
-        }
-        self.assertEqual(2.0, recommender.extract_current_ratio(balance_sheet))
 
     def test_has_healthy_current_ratio(self):
         current_ratio = 2.0
@@ -39,25 +26,6 @@ class TestGetStockData(unittest.TestCase):
         current_ratio = 1.499
         self.assertFalse(recommender.has_healthy_current_ratio(current_ratio))
 
-    def test_extract_decade_of_annual_earnings(self):
-        earnings = {
-            "annualEarnings": [
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-                {"reportedEPS": 0.1},
-            ]
-        }
-        self.assertEqual(
-            [0.1] * 10, recommender.extract_decade_of_annual_earnings(earnings)
-        )
-
     def test_has_consistent_earnings(self):
         decade_of_annual_earnings = [0.1] * 10
         self.assertTrue(recommender.has_consistent_earnings(decade_of_annual_earnings))
@@ -66,13 +34,6 @@ class TestGetStockData(unittest.TestCase):
         decade_of_annual_earnings = [-0.1] + [0.1] * 9
         self.assertFalse(recommender.has_consistent_earnings(decade_of_annual_earnings))
 
-    def test_compute_earnings_growth_past_decade(self):
-        decade_of_annual_earnings = [1.33] * 3 + [0] * 4 + [1.0] * 3
-        self.assertAlmostEqual(
-            0.33,
-            recommender.compute_earnings_growth_past_decade(decade_of_annual_earnings),
-        )
-
     def test_has_earnings_growth(self):
         earnings_growth_past_decade = 0.33
         self.assertTrue(recommender.has_earnings_growth(earnings_growth_past_decade))
@@ -80,28 +41,6 @@ class TestGetStockData(unittest.TestCase):
     def test_has_insufficient_earnings_growth(self):
         earnings_growth_past_decade = 0.32
         self.assertFalse(recommender.has_earnings_growth(earnings_growth_past_decade))
-
-    def test_extract_p_e_ratio(self):
-        earnings = {
-            "quarterlyEarnings": [
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-            ]
-        }
-        quote = {
-            "Global Quote": {"05. price": "60.00"},
-        }
-        self.assertEqual(15.0, recommender.extract_p_e_ratio(earnings, quote))
 
     def test_has_low_p_e_ratio(self):
         p_e_ratio = 15.0

@@ -4,9 +4,6 @@ import unittest
 
 
 class TestApi(unittest.TestCase):
-    def tearDown(self):
-        time.sleep(1)
-    
     def test_get_overview(self):
         symbol = "AAPL"
         data = api.get_stock_overview(symbol)
@@ -26,6 +23,7 @@ class TestApi(unittest.TestCase):
         symbol = "AAPL"
         data = api.get_stock_quote(symbol)
         self.assertEqual(data["Global Quote"]["01. symbol"], symbol)
+
 
 if __name__ == "__main__":
     unittest.main()
