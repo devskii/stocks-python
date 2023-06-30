@@ -21,15 +21,8 @@ def has_earnings_growth(earnings_growth_past_decade):
     return earnings_growth_past_decade >= 0.33
 
 
-def has_low_pe_ratio(earnings, quote):
-    quarterly_earnings = earnings["quarterlyEarnings"]
-    recent_quarters_earnings = [
-        float(quarter["reportedEPS"]) for quarter in quarterly_earnings[:12]
-    ]
-    average_annual_earnings = sum(recent_quarters_earnings) / 3
-    price = float(quote["Global Quote"]["05. price"])
-    ratio = price / average_annual_earnings
-    return ratio <= 15.0
+def has_low_p_e_ratio(p_e_ratio):
+    return p_e_ratio <= 15.0
 
 
 def plot_dividends(time_series_monthly_adjusted):
@@ -76,6 +69,16 @@ def compute_earnings_growth_past_decade(decade_of_annual_earnings):
     return growth
 
 
+def extract_p_e_ratio(earnings, quote):
+    quarterly_earnings = earnings["quarterlyEarnings"]
+    recent_quarters_earnings = [
+        float(quarter["reportedEPS"]) for quarter in quarterly_earnings[:12]
+    ]
+    average_annual_earnings = sum(recent_quarters_earnings) / 3
+    price = float(quote["Global Quote"]["05. price"])
+    return price / average_annual_earnings
+
+
 def analyze(symbol):
     overview = api.get_stock_overview(symbol)
     balance_sheet = api.get_stock_balance_sheet(symbol)
@@ -90,6 +93,7 @@ def analyze(symbol):
         earnings_growth_past_decade = compute_earnings_growth_past_decade(
             decade_of_annual_earnings
         )
+        p_e_ratio = extract_p_e_ratio(earnings, quote)
     except KeyError:
         print(
             "We are exceeding the API rate limit. Please wait 60 seconds for it to reset. Sleeping..."
@@ -101,7 +105,7 @@ def analyze(symbol):
     healthy_current = has_healthy_current_ratio(current_ratio)
     earnings_consistent = has_consistent_earnings(decade_of_annual_earnings)
     earnings_growth = has_earnings_growth(earnings_growth_past_decade)
-    low_pe = has_low_pe_ratio(earnings, quote)
+    low_pe = has_low_p_e_ratio(p_e_ratio)
 
     recommendation = (
         large and healthy_current and earnings_consistent and earnings_growth and low_pe
@@ -126,7 +130,7 @@ def analyze(symbol):
     print(
         f"Earnings Growth over last decade: {round(earnings_growth_past_decade * 100, 0)}%"
     )
-    # TODO print(f"P/E Ratio based on MR3Y: {}")
+    print(f"P/E Ratio based on most recent 12 quarters: {round(p_e_ratio, 2)}")
     print("============================")
 
 

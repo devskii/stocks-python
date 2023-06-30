@@ -81,7 +81,7 @@ class TestGetStockData(unittest.TestCase):
         earnings_growth_past_decade = 0.32
         self.assertFalse(recommender.has_earnings_growth(earnings_growth_past_decade))
 
-    def test_has_low_pe_ratio(self):
+    def test_extract_p_e_ratio(self):
         earnings = {
             "quarterlyEarnings": [
                 {"reportedEPS": 1.0},
@@ -101,27 +101,15 @@ class TestGetStockData(unittest.TestCase):
         quote = {
             "Global Quote": {"05. price": "60.00"},
         }
-        self.assertTrue(recommender.has_low_pe_ratio(earnings, quote))
+        self.assertEqual(15.0, recommender.extract_p_e_ratio(earnings, quote))
 
-    def test_has_high_pe_ratio(self):
-        earnings = {
-            "quarterlyEarnings": [
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-            ]
-        }
-        quote = {"Global Quote": {"05. price": "60.01"}}
-        self.assertFalse(recommender.has_low_pe_ratio(earnings, quote))
+    def test_has_low_p_e_ratio(self):
+        p_e_ratio = 15.0
+        self.assertTrue(recommender.has_low_p_e_ratio(p_e_ratio))
+
+    def test_has_high_p_e_ratio(self):
+        p_e_ratio = 15.1
+        self.assertFalse(recommender.has_low_p_e_ratio(p_e_ratio))
 
     @patch.object(sys, "argv", ["recommender.py"])
     def test_no_ticker_symbol(self):
