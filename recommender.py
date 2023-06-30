@@ -8,11 +8,7 @@ def is_large_cap(market_cap):
     return market_cap > 30000000000
 
 
-def has_healthy_current_ratio(balance_sheet):
-    quarterly_reports = balance_sheet["quarterlyReports"]
-    total_current_assets = int(quarterly_reports[0]["totalCurrentAssets"])
-    total_current_liabilities = int(quarterly_reports[0]["totalCurrentLiabilities"])
-    current_ratio = total_current_assets / total_current_liabilities
+def has_healthy_current_ratio(current_ratio):
     return current_ratio >= 1.5 and current_ratio <= 3
 
 
@@ -68,6 +64,13 @@ def extract_market_cap(overview):
     return int(overview["MarketCapitalization"])
 
 
+def extract_current_ratio(balance_sheet):
+    quarterly_reports = balance_sheet["quarterlyReports"]
+    total_current_assets = int(quarterly_reports[0]["totalCurrentAssets"])
+    total_current_liabilities = int(quarterly_reports[0]["totalCurrentLiabilities"])
+    return total_current_assets / total_current_liabilities
+
+
 def analyze(symbol):
     overview = api.get_stock_overview(symbol)
     balance_sheet = api.get_stock_balance_sheet(symbol)
@@ -76,9 +79,10 @@ def analyze(symbol):
     quote = api.get_stock_quote(symbol)
 
     market_cap = extract_market_cap(overview)
+    current_ratio = extract_current_ratio(balance_sheet)
 
     large = is_large_cap(market_cap)
-    healthy_current = has_healthy_current_ratio(balance_sheet)
+    healthy_current = has_healthy_current_ratio(current_ratio)
     earnings_consistent = has_consistent_earnings(earnings)
     earnings_growth = has_earnings_growth(earnings)
     low_pe = has_low_pe_ratio(earnings, quote)
@@ -100,9 +104,8 @@ def analyze(symbol):
     print(f"has_low_pe_ratio: {low_pe}")
     plot_dividends(time_series_monthly_adjusted)
     print("--------- Details ----------")
-    # print(format(mcap, ","))
     print(f"Market Cap: {format(market_cap, ',')}")
-    # TODO print(f"Current Ratio: {}")
+    print(f"Current Ratio: {current_ratio}")
     # TODO print(f"10 years of Annual EPS: {}")
     # TODO print(f"Earnings Growth over last decade: {}")
     # TODO print(f"P/E Ratio based on MR3Y: {}")

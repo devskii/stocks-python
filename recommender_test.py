@@ -19,29 +19,25 @@ class TestGetStockData(unittest.TestCase):
         market_cap = 29999999999
         self.assertFalse(recommender.is_large_cap(market_cap))
 
-    def test_has_healthy_current_ratio(self):
+    def test_extract_current_ratio(self):
         balance_sheet = {
             "quarterlyReports": [
                 {"totalCurrentAssets": 2000, "totalCurrentLiabilities": 1000}
             ]
         }
-        self.assertTrue(recommender.has_healthy_current_ratio(balance_sheet))
+        self.assertEqual(2.0, recommender.extract_current_ratio(balance_sheet))
+
+    def test_has_healthy_current_ratio(self):
+        current_ratio = 2.0
+        self.assertTrue(recommender.has_healthy_current_ratio(current_ratio))
 
     def test_has_unhealthy_high_current_ratio(self):
-        balance_sheet = {
-            "quarterlyReports": [
-                {"totalCurrentAssets": 3001, "totalCurrentLiabilities": 1000}
-            ]
-        }
-        self.assertFalse(recommender.has_healthy_current_ratio(balance_sheet))
+        current_ratio = 3.001
+        self.assertFalse(recommender.has_healthy_current_ratio(current_ratio))
 
     def test_has_unhealthy_low_current_ratio(self):
-        balance_sheet = {
-            "quarterlyReports": [
-                {"totalCurrentAssets": 1499, "totalCurrentLiabilities": 1000}
-            ]
-        }
-        self.assertFalse(recommender.has_healthy_current_ratio(balance_sheet))
+        current_ratio = 1.499
+        self.assertFalse(recommender.has_healthy_current_ratio(current_ratio))
 
     def test_has_consistent_earnings(self):
         earnings = {
