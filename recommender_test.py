@@ -66,39 +66,20 @@ class TestGetStockData(unittest.TestCase):
         decade_of_annual_earnings = [-0.1] + [0.1] * 9
         self.assertFalse(recommender.has_consistent_earnings(decade_of_annual_earnings))
 
+    def test_compute_earnings_growth_past_decade(self):
+        decade_of_annual_earnings = [1.33] * 3 + [0] * 4 + [1.0] * 3
+        self.assertAlmostEqual(
+            0.33,
+            recommender.compute_earnings_growth_past_decade(decade_of_annual_earnings),
+        )
+
     def test_has_earnings_growth(self):
-        earnings = {
-            "annualEarnings": [
-                {"reportedEPS": 1.33},
-                {"reportedEPS": 1.33},
-                {"reportedEPS": 1.33},
-                {"reportedEPS": 0},
-                {"reportedEPS": 0},
-                {"reportedEPS": 0},
-                {"reportedEPS": 0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-            ]
-        }
-        self.assertTrue(recommender.has_earnings_growth(earnings))
+        earnings_growth_past_decade = 0.33
+        self.assertTrue(recommender.has_earnings_growth(earnings_growth_past_decade))
 
     def test_has_insufficient_earnings_growth(self):
-        earnings = {
-            "annualEarnings": [
-                {"reportedEPS": 1.32},
-                {"reportedEPS": 1.32},
-                {"reportedEPS": 1.32},
-                {"reportedEPS": 0},
-                {"reportedEPS": 0},
-                {"reportedEPS": 0},
-                {"reportedEPS": 0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-                {"reportedEPS": 1.0},
-            ]
-        }
-        self.assertFalse(recommender.has_earnings_growth(earnings))
+        earnings_growth_past_decade = 0.32
+        self.assertFalse(recommender.has_earnings_growth(earnings_growth_past_decade))
 
     def test_has_low_pe_ratio(self):
         earnings = {

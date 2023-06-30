@@ -17,15 +17,8 @@ def has_consistent_earnings(decade_of_annual_earnings):
     return all(eps >= 0 for eps in decade_of_annual_earnings)
 
 
-def has_earnings_growth(earnings):
-    annual_reported_eps = [
-        float(year["reportedEPS"]) for year in earnings["annualEarnings"]
-    ]
-    most_recent_three_years = sum(annual_reported_eps[:3])
-    decade_beginning_three_years = sum(annual_reported_eps[7:10])
-    difference = most_recent_three_years - decade_beginning_three_years
-    growth = difference / decade_beginning_three_years
-    return growth >= 0.33
+def has_earnings_growth(earnings_growth_past_decade):
+    return earnings_growth_past_decade >= 0.33
 
 
 def has_low_pe_ratio(earnings, quote):
@@ -75,6 +68,14 @@ def extract_decade_of_annual_earnings(earnings):
     return [float(year["reportedEPS"]) for year in earnings["annualEarnings"][:10]]
 
 
+def compute_earnings_growth_past_decade(decade_of_annual_earnings):
+    most_recent_three_years = sum(decade_of_annual_earnings[:3])
+    decade_beginning_three_years = sum(decade_of_annual_earnings[7:10])
+    difference = most_recent_three_years - decade_beginning_three_years
+    growth = difference / decade_beginning_three_years
+    return growth
+
+
 def analyze(symbol):
     overview = api.get_stock_overview(symbol)
     balance_sheet = api.get_stock_balance_sheet(symbol)
@@ -86,6 +87,9 @@ def analyze(symbol):
         market_cap = extract_market_cap(overview)
         current_ratio = extract_current_ratio(balance_sheet)
         decade_of_annual_earnings = extract_decade_of_annual_earnings(earnings)
+        earnings_growth_past_decade = compute_earnings_growth_past_decade(
+            decade_of_annual_earnings
+        )
     except KeyError:
         print(
             "We are exceeding the API rate limit. Please wait 60 seconds for it to reset. Sleeping..."
@@ -96,7 +100,7 @@ def analyze(symbol):
     large = is_large_cap(market_cap)
     healthy_current = has_healthy_current_ratio(current_ratio)
     earnings_consistent = has_consistent_earnings(decade_of_annual_earnings)
-    earnings_growth = has_earnings_growth(earnings)
+    earnings_growth = has_earnings_growth(earnings_growth_past_decade)
     low_pe = has_low_pe_ratio(earnings, quote)
 
     recommendation = (
@@ -117,9 +121,11 @@ def analyze(symbol):
     plot_dividends(time_series_monthly_adjusted)
     print("--------- Details ----------")
     print(f"Market Cap: {format(market_cap, ',')}")
-    print(f"Current Ratio: {current_ratio}")
+    print(f"Current Ratio: {round(current_ratio, 2)}")
     print(f"10 years of Annual EPS: {decade_of_annual_earnings}")
-    # TODO print(f"Earnings Growth over last decade: {}")
+    print(
+        f"Earnings Growth over last decade: {round(earnings_growth_past_decade * 100, 0)}%"
+    )
     # TODO print(f"P/E Ratio based on MR3Y: {}")
     print("============================")
 
