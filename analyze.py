@@ -19,18 +19,22 @@ def plot_dividends_as_tempfile(time_series_monthly_adjusted):
         for date, info in time_series_items
         if float(info["7. dividend amount"]) > 0
     }
-    df = pd.DataFrame(list(dividends.items()), columns=["Date", "Dividend"])
-    df["Date"] = pd.to_datetime(df["Date"])
-    df.set_index("Date", inplace=True)
-    df = df.resample("M").asfreq()
-    df.reset_index(inplace=True)
-    fig = go.Figure(data=go.Scatter(x=df["Date"], y=df["Dividend"], mode="markers"))
-    fig.update_layout(
-        title="Dividend History<br><sub>Friendly reminder to check the dividend looks strong (increasing) and consistent (no gaps) for the past 20+ years.</sub>",
-        xaxis_title="Date",
-        yaxis_title="Dividend Amount",
-    )
-    fig.write_image("tmp/dividends.png")
+    if len(dividends) == 0:
+        print("No dividend history.")
+        return
+    else:
+        df = pd.DataFrame(list(dividends.items()), columns=["Date", "Dividend"])
+        df["Date"] = pd.to_datetime(df["Date"])
+        df.set_index("Date", inplace=True)
+        df = df.resample("M").asfreq()
+        df.reset_index(inplace=True)
+        fig = go.Figure(data=go.Scatter(x=df["Date"], y=df["Dividend"], mode="markers"))
+        fig.update_layout(
+            title="Dividend History<br><sub>Friendly reminder to check the dividend looks strong (increasing) and consistent (no gaps) for the past 20+ years.</sub>",
+            xaxis_title="Date",
+            yaxis_title="Dividend Amount",
+        )
+        fig.write_image("tmp/dividends.png")
 
 
 def analyze(symbol):
@@ -61,7 +65,8 @@ def build_recommendation_pdf(symbol):
         styles = getSampleStyleSheet()
         for line in f:
             story.append(Paragraph(line, styles["Normal"]))
-    story.append(Image("tmp/dividends.png", width=400, height=300))
+    if os.path.exists("tmp/dividends.png"):
+        story.append(Image("tmp/dividends.png", width=400, height=300))
     story.append(PageBreak())
     doc.build(story)
 
