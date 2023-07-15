@@ -10,7 +10,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from symbol_data import SymbolData
 
 
-def plot_dividends(time_series_monthly_adjusted):
+def plot_dividends_as_tempfile(time_series_monthly_adjusted):
     time_series_items = time_series_monthly_adjusted[
         "Monthly Adjusted Time Series"
     ].items()
@@ -44,35 +44,44 @@ def analyze(symbol):
         sys.exit(1)
 
     AnalysisPrinter(symbol_data).print_analysis()
-    plot_dividends(symbol_data.time_series_monthly_adjusted)
+    plot_dividends_as_tempfile(symbol_data.time_series_monthly_adjusted)
+
+
+def print_analysis_to_tempfiles(symbol):
+    old_stdout = sys.stdout
+    sys.stdout = open("tmp/output.txt", "w")
+    analyze(symbol)
+    sys.stdout = old_stdout
+
+
+def build_recommendation_pdf(symbol):
+    doc = SimpleDocTemplate(f"reports/Recommendation for {symbol}.pdf", pagesize=letter)
+    story = []
+    with open("tmp/output.txt", "r") as f:
+        styles = getSampleStyleSheet()
+        for line in f:
+            story.append(Paragraph(line, styles["Normal"]))
+    story.append(Image("tmp/dividends.png", width=400, height=300))
+    story.append(PageBreak())
+    doc.build(story)
+
+
+def generate_report(symbol):
+    print_analysis_to_tempfiles(symbol)
+    build_recommendation_pdf(symbol)
+    cleanup_temp_files()
+
+
+def cleanup_temp_files():
+    if os.path.exists("tmp/output.txt"):
+        os.remove("tmp/output.txt")
+    if os.path.exists("tmp/dividends.png"):
+        os.remove("tmp/dividends.png")
 
 
 def main():
     if len(sys.argv) > 1:
-        old_stdout = sys.stdout
-        sys.stdout = open("tmp/output.txt", "w")
-
-        symbol = sys.argv[1]
-        analyze(symbol)
-
-        sys.stdout = old_stdout
-
-        doc = SimpleDocTemplate(
-            f"reports/Recommendation for {symbol}.pdf", pagesize=letter
-        )
-        story = []
-        with open("tmp/output.txt", "r") as f:
-            styles = getSampleStyleSheet()
-            for line in f:
-                story.append(Paragraph(line, styles["Normal"]))
-        story.append(Image("tmp/dividends.png", width=400, height=300))
-        story.append(PageBreak())
-        doc.build(story)
-
-        if os.path.exists("tmp/output.txt"):
-            os.remove("tmp/output.txt")
-        if os.path.exists("tmp/dividends.png"):
-            os.remove("tmp/dividends.png")
+        generate_report(sys.argv[1])
 
     else:
         print("Please provide a ticker symbol as a command-line argument.")
