@@ -81,7 +81,14 @@ def cleanup_temp_files():
 
 def main():
     if len(sys.argv) > 1:
-        generate_report(sys.argv[1])
+        comma_separated_symbols = sys.argv[1]
+        symbols = comma_separated_symbols.split(",")
+        for s in symbols:
+            generate_report(s)
+            print(
+                f"Report generated for {s}, waiting 60 seconds before generating the next report to avoid API throttling..."
+            )
+            time.sleep(60)
 
     else:
         print("Please provide a ticker symbol as a command-line argument.")
