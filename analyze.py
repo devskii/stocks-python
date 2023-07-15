@@ -1,8 +1,12 @@
+import os
 import time
 import plotly.graph_objects as go
 import pandas as pd
 import sys
-from recommender import Recommender
+from analysis_printer import AnalysisPrinter
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Image, PageBreak
+from reportlab.lib.styles import getSampleStyleSheet
 from symbol_data import SymbolData
 
 
@@ -26,11 +30,7 @@ def plot_dividends(time_series_monthly_adjusted):
         xaxis_title="Date",
         yaxis_title="Dividend Amount",
     )
-    fig.show()
-
-
-def bold(message):
-    return f"\033[1m{message}\033[0m"
+    fig.write_image("tmp/dividends.png")
 
 
 def analyze(symbol):
@@ -43,34 +43,37 @@ def analyze(symbol):
         time.sleep(60)
         sys.exit(1)
 
-    recommender = Recommender(symbol_data)
-
-    print(bold("====== RECOMMENDATION ======"))
-    print(f"The recommendation for {symbol} is {recommender.recommendation()}")
-    print(bold("--------- Criteria ---------"))
-    print(f"is_large_cap: {recommender.is_large_cap()}")
-    print(f"has_healthy_current_ratio: {recommender.has_healthy_current_ratio()}")
-    print(f"has_consistent_earnings: {recommender.has_consistent_earnings()}")
-    print(f"has_earnings_growth: {recommender.has_earnings_growth()}")
-    print(f"has_low_pe_ratio: {recommender.has_low_p_e_ratio()}")
+    AnalysisPrinter(symbol_data).print_analysis()
     plot_dividends(symbol_data.time_series_monthly_adjusted)
-    print(bold("--------- Details ----------"))
-    print(f"Market Cap: {format(symbol_data.market_cap, ',')}")
-    print(f"Current Ratio: {round(symbol_data.current_ratio, 2)}")
-    print(f"10 years of Annual EPS: {symbol_data.decade_of_annual_earnings}")
-    print(
-        f"Earnings Growth over last decade: {round(symbol_data.earnings_growth_past_decade * 100, 0)}%"
-    )
-    print(
-        f"P/E Ratio based on most recent 12 quarters: {round(symbol_data.p_e_ratio, 2)}"
-    )
-    print(bold("============================"))
 
 
 def main():
     if len(sys.argv) > 1:
+        old_stdout = sys.stdout
+        sys.stdout = open("tmp/output.txt", "w")
+
         symbol = sys.argv[1]
         analyze(symbol)
+
+        sys.stdout = old_stdout
+
+        doc = SimpleDocTemplate(
+            f"reports/Recommendation for {symbol}.pdf", pagesize=letter
+        )
+        story = []
+        with open("tmp/output.txt", "r") as f:
+            styles = getSampleStyleSheet()
+            for line in f:
+                story.append(Paragraph(line, styles["Normal"]))
+        story.append(Image("tmp/dividends.png", width=400, height=300))
+        story.append(PageBreak())
+        doc.build(story)
+
+        if os.path.exists("tmp/output.txt"):
+            os.remove("tmp/output.txt")
+        if os.path.exists("tmp/dividends.png"):
+            os.remove("tmp/dividends.png")
+
     else:
         print("Please provide a ticker symbol as a command-line argument.")
         sys.exit(1)
