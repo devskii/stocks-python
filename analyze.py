@@ -94,7 +94,7 @@ def main():
             print(f"Report generated for {s}")
             if i != len(symbols) - 1:
                 print(
-                    f"Waiting 60 seconds before generating the next report to avoid API throttling..."
+                    f"Waiting 60 seconds before generating the next report ({symbols[i+1]}) to avoid API throttling..."
                 )
                 time.sleep(60)
 
