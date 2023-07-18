@@ -1,4 +1,4 @@
-coverage
+coverage==7.2.7
 pandas
 plotly
 pylint
