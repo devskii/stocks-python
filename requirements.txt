@@ -1,5 +1,6 @@
-pylint
+coverage
 pandas
 plotly
+pylint
 reportlab
 requests
