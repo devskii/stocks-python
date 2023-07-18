@@ -3,6 +3,7 @@ This is an application that tells you whether or not to buy a stock, based on a 
 
 # Instructions
 Replace `AAPL,TSLA` with a comma-separated list of stock tickers that you'd like to analyze.
+1. Run `pip3 install -r requirements.txt`
 1. Run `python3 analyze.py AAPL,TSLA`
-2. Wait for the script to finish.
-3. Open the PDFs in the reports/ directory to see the recommendations.
+1. Wait for the script to finish.
+1. Open the PDFs in the reports/ directory to see the recommendations.
