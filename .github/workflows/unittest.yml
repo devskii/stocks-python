@@ -20,7 +20,7 @@ jobs:
         pip install -r requirements.txt
     - name: Run unit tests with coverage
       run: |
-        coverage run --source=. -m unittest ./*_test.py
+        coverage run -m unittest ./*_test.py
     - name: Report and check coverage
       run: |
         coverage report -m --fail-under=70
