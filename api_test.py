@@ -1,5 +1,6 @@
-import api
 import unittest
+
+import api
 
 
 class TestApi(unittest.TestCase):

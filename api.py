@@ -41,11 +41,10 @@ def get_function(symbol, function):
     datatype = "json"
 
     request_url = f"{base_url}function={function}&symbol={symbol}&apikey={api_key}&datatype={datatype}"
-    response = requests.get(request_url)
+    response = requests.get(request_url, timeout=20)
 
     if response.status_code == 200:
-        data = response.json()
-        return data
-    else:
-        print(f"API request failed with status code {response.status_code}")
-        print(response.text)
+        return response.json()
+
+    print(f"API request failed with status code {response.status_code}")
+    print(response.text)

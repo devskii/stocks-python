@@ -1,7 +1,8 @@
 import unittest
+from unittest.mock import MagicMock
+
 from recommender import Recommender
 from symbol_data import SymbolData
-from unittest.mock import MagicMock
 
 
 class TestRecommender(unittest.TestCase):

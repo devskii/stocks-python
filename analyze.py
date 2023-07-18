@@ -1,13 +1,15 @@
 import os
-import time
-import plotly.graph_objects as go
-import pandas as pd
 import sys
+import time
+
+import pandas as pd
+import plotly.graph_objects as go
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate
+
 import api
 from analysis_printer import AnalysisPrinter
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Image, PageBreak
-from reportlab.lib.styles import getSampleStyleSheet
 
 
 def plot_dividends_as_tempfile(time_series_monthly_adjusted):

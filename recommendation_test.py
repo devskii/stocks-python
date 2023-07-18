@@ -1,6 +1,7 @@
 import unittest
-from recommender import Recommender
 from unittest.mock import MagicMock
+
+from recommender import Recommender
 
 
 class TestRecommendation(unittest.TestCase):
