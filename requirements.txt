@@ -4,3 +4,4 @@ plotly
 pylint
 reportlab
 requests
+unittest
