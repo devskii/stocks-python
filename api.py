@@ -23,7 +23,6 @@ def get_stock_quote(symbol):
 
 
 def get_function(symbol, function):
-    # api_key = "***REMOVED***"
     api_key = os.environ.get("ALPHAVANTAGE_API_KEY")
     base_url = "https://www.alphavantage.co/query?"
     datatype = "json"
