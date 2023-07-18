@@ -8,7 +8,6 @@ from analysis_printer import AnalysisPrinter
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Image, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet
-from symbol_data import SymbolData
 
 
 def plot_dividends_as_tempfile(time_series_monthly_adjusted):
@@ -40,21 +39,7 @@ def plot_dividends_as_tempfile(time_series_monthly_adjusted):
 
 def analyze(symbol):
     try:
-        overview = api.get_stock_overview(symbol)
-        balance_sheet = api.get_stock_balance_sheet(symbol)
-        earnings = api.get_stock_earnings(symbol)
-        quote = api.get_stock_quote(symbol)
-        time_series_monthly_adjusted = api.get_stock_time_series_monthly_adjusted(
-            symbol
-        )
-        symbol_data = SymbolData(
-            symbol,
-            overview,
-            balance_sheet,
-            earnings,
-            quote,
-            time_series_monthly_adjusted,
-        )
+        symbol_data = api.get_symbol_data(symbol)
     except KeyError:
         print(
             "We are exceeding the API rate limit. Please wait 60 seconds for it to reset. Sleeping..."
@@ -99,20 +84,23 @@ def cleanup_temp_files():
         os.remove("tmp/dividends.png")
 
 
+def generate_reports(symbols):
+    for i in range(len(symbols)):
+        s = symbols[i]
+        generate_report(s)
+        print(f"Report generated for {s}")
+        if i != len(symbols) - 1:
+            print(
+                f"Waiting 60 seconds before generating the next report ({symbols[i+1]}) to avoid API throttling..."
+            )
+            time.sleep(60)
+
+
 def main():
     if len(sys.argv) > 1:
         comma_separated_symbols = sys.argv[1]
         symbols = comma_separated_symbols.split(",")
-        for i in range(len(symbols)):
-            s = symbols[i]
-            generate_report(s)
-            print(f"Report generated for {s}")
-            if i != len(symbols) - 1:
-                print(
-                    f"Waiting 60 seconds before generating the next report ({symbols[i+1]}) to avoid API throttling..."
-                )
-                time.sleep(60)
-
+        generate_reports(symbols)
     else:
         print("Please provide a ticker symbol as a command-line argument.")
         sys.exit(1)

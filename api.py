@@ -1,6 +1,19 @@
 import os
 import requests
 
+from symbol_data import SymbolData
+
+
+def get_symbol_data(symbol):
+    return SymbolData(
+        symbol=symbol,
+        overview=get_stock_overview(symbol),
+        balance_sheet=get_stock_balance_sheet(symbol),
+        earnings=get_stock_earnings(symbol),
+        quote=get_stock_quote(symbol),
+        time_series_monthly_adjusted=get_stock_time_series_monthly_adjusted(symbol),
+    )
+
 
 def get_stock_overview(symbol):
     return get_function(symbol, "OVERVIEW")
