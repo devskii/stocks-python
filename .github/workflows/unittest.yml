@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.9", "3.10"]
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -20,7 +20,7 @@ jobs:
         pip install -r requirements.txt
     - name: Run unit tests with coverage
       run: |
-        coverage run --debug=trace -m unittest ./*_test.py
+        coverage run -m unittest ./*_test.py
     - name: Report and check coverage
       run: |
         coverage report -m --fail-under=70
