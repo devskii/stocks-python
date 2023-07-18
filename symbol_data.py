@@ -1,17 +1,15 @@
-import api
-
-
 class SymbolData:
-    def __init__(self, symbol):
+    def __init__(
+        self,
+        symbol,
+        overview,
+        balance_sheet,
+        earnings,
+        quote,
+        time_series_monthly_adjusted,
+    ):
         self.symbol = symbol
-
-        overview = api.get_stock_overview(symbol)
-        balance_sheet = api.get_stock_balance_sheet(symbol)
-        earnings = api.get_stock_earnings(symbol)
-        quote = api.get_stock_quote(symbol)
-        self.time_series_monthly_adjusted = api.get_stock_time_series_monthly_adjusted(
-            symbol
-        )
+        self.time_series_monthly_adjusted = time_series_monthly_adjusted
 
         # set market_cap
         self.market_cap = int(overview["MarketCapitalization"])

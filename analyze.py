@@ -3,6 +3,7 @@ import time
 import plotly.graph_objects as go
 import pandas as pd
 import sys
+import api
 from analysis_printer import AnalysisPrinter
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Image, PageBreak
@@ -39,7 +40,21 @@ def plot_dividends_as_tempfile(time_series_monthly_adjusted):
 
 def analyze(symbol):
     try:
-        symbol_data = SymbolData(symbol)
+        overview = api.get_stock_overview(symbol)
+        balance_sheet = api.get_stock_balance_sheet(symbol)
+        earnings = api.get_stock_earnings(symbol)
+        quote = api.get_stock_quote(symbol)
+        time_series_monthly_adjusted = api.get_stock_time_series_monthly_adjusted(
+            symbol
+        )
+        symbol_data = SymbolData(
+            symbol,
+            overview,
+            balance_sheet,
+            earnings,
+            quote,
+            time_series_monthly_adjusted,
+        )
     except KeyError:
         print(
             "We are exceeding the API rate limit. Please wait 60 seconds for it to reset. Sleeping..."
