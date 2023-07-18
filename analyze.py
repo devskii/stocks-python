@@ -24,28 +24,28 @@ def plot_dividends_as_tempfile(time_series_monthly_adjusted):
     if len(dividends) == 0:
         print("No dividend history.")
         return
-    else:
-        df = pd.DataFrame(list(dividends.items()), columns=["Date", "Dividend"])
-        df["Date"] = pd.to_datetime(df["Date"])
-        df.set_index("Date", inplace=True)
-        df = df.resample("M").asfreq()
-        df.reset_index(inplace=True)
-        fig = go.Figure(data=go.Scatter(x=df["Date"], y=df["Dividend"], mode="markers"))
-        fig.update_layout(
-            title="Dividend History<br><sub>Friendly reminder to check the dividend looks strong (increasing) and consistent (no gaps) for the past 20+ years.</sub>",
-            xaxis_title="Date",
-            yaxis_title="Dividend Amount",
-        )
-        fig.write_image("tmp/dividends.png")
+
+    data_frame = pd.DataFrame(list(dividends.items()), columns=["Date", "Dividend"])
+    data_frame["Date"] = pd.to_datetime(data_frame["Date"])
+    data_frame.set_index("Date", inplace=True)
+    data_frame = data_frame.resample("M").asfreq()
+    data_frame.reset_index(inplace=True)
+    fig = go.Figure(
+        data=go.Scatter(x=data_frame["Date"], y=data_frame["Dividend"], mode="markers")
+    )
+    fig.update_layout(
+        title="Dividend History<br><sub>Friendly reminder: check for strong (increasing) and consistent (no gaps) for 20+ years.</sub>",
+        xaxis_title="Date",
+        yaxis_title="Dividend Amount",
+    )
+    fig.write_image("tmp/dividends.png")
 
 
 def analyze(symbol):
     try:
         symbol_data = api.get_symbol_data(symbol)
     except KeyError:
-        print(
-            "We are exceeding the API rate limit. Please wait 60 seconds for it to reset. Sleeping..."
-        )
+        print("Exceeding API rate limit. Please wait 60s for it to reset...")
         time.sleep(60)
         sys.exit(1)
 
@@ -63,9 +63,9 @@ def print_analysis_to_tempfiles(symbol):
 def build_recommendation_pdf(symbol):
     doc = SimpleDocTemplate(f"reports/Recommendation for {symbol}.pdf", pagesize=letter)
     story = []
-    with open("tmp/output.txt", "r") as f:
+    with open("tmp/output.txt", "r") as file:
         styles = getSampleStyleSheet()
-        for line in f:
+        for line in file:
             story.append(Paragraph(line, styles["Normal"]))
     if os.path.exists("tmp/dividends.png"):
         story.append(Image("tmp/dividends.png", width=400, height=300))
@@ -88,9 +88,9 @@ def cleanup_temp_files():
 
 def generate_reports(symbols):
     for i in range(len(symbols)):
-        s = symbols[i]
-        generate_report(s)
-        print(f"Report generated for {s}")
+        symbol = symbols[i]
+        generate_report(symbol)
+        print(f"Report generated for {symbol}")
         if i != len(symbols) - 1:
             print(
                 f"Waiting 60 seconds before generating the next report ({symbols[i+1]}) to avoid API throttling..."
