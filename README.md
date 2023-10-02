@@ -7,3 +7,10 @@ This is an application that tells you whether or not to buy a stock, based on a 
 1. Run `python3 analyze.py $(cat watch_list.txt)`
 1. Wait for the script to finish.
 1. Open the PDFs in the reports/ directory to see the recommendations.
+
+# Checks
+## Running unit tests
+See the file, `.github/workflows/unittest.yml`
+
+## Running linter
+See the file, `.github/workflows/pylint.yml`
