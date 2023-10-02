@@ -14,3 +14,8 @@ See the file, `.github/workflows/unittest.yml`
 
 ## Running linter
 See the file, `.github/workflows/pylint.yml`
+
+# API docs
+https://www.alphavantage.co/documentation/
+https://www.alphavantage.co/query?function=OVERVIEW&symbol=IBM&apikey=demo
+https://www.alphavantage.co/query?function=EARNINGS&symbol=IBM&apikey=demo
