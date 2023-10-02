@@ -37,5 +37,5 @@ class SymbolData:
             float(quarter["reportedEPS"]) for quarter in quarterly_earnings[:12]
         ]
         average_annual_earnings = sum(recent_quarters_earnings) / 3
-        price = float(quote["Global Quote"]["05. price"])
-        self.p_e_ratio = price / average_annual_earnings
+        self.market_price = float(quote["Global Quote"]["05. price"])
+        self.p_e_ratio = self.market_price / average_annual_earnings

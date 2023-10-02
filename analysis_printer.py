@@ -32,10 +32,11 @@ class AnalysisPrinter:
         print("--------- Details ----------")
         print(f"Market Cap: {format(self.symbol_data.market_cap, ',')}")
         print(f"Current Ratio: {round(self.symbol_data.current_ratio, 2)}")
-        print(f"10 years of Annual EPS: {self.symbol_data.decade_of_annual_earnings}")
+        print(f"10 years of Annual EPS (going back in time): {self.symbol_data.decade_of_annual_earnings}")
         print(
             f"Earnings Growth over last decade: {round(self.symbol_data.earnings_growth_past_decade * 100, 0)}%"
         )
         print(
             f"P/E Ratio based on most recent 12 quarters: {round(self.symbol_data.p_e_ratio, 2)}"
         )
+        print(f"Market Price: ${self.symbol_data.market_price}")
