@@ -5,7 +5,7 @@ This is an application that tells you whether or not to buy a stock, based on a 
 1. In `watch_list.txt`, add a comma-separated list of stock tickers you'd like to analyze. For example, `AAPL,TSLA`.
 1. Run `pip3 install -r requirements.txt`
 1. Run `python3 analyze.py $(cat watch_list.txt)`
-1. Wait for the script to finish.
+1. Wait for the script to finish. Due to API rate-limits this will take ~60 seconds per stock.
 1. Open the PDFs in the reports/ directory to see the recommendations.
 
 # Checks
